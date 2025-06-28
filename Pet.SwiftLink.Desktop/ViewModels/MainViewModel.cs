@@ -73,20 +73,18 @@ public class MainViewModel : ObservableObject
 
     private void OpenQuickLink(object parameter)
     {
-        if (parameter is QuickLinkViewModel link)
+        if (parameter is not QuickLinkViewModel link) return;
+        try
         {
-            try
+            System.Diagnostics.Process.Start(new ProcessStartInfo
             {
-                System.Diagnostics.Process.Start(new ProcessStartInfo
-                {
-                    FileName = link.Path,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                _dialogService.ShowError($"Не удалось открыть: {ex.Message}");
-            }
+                FileName = link.Path,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowError($"Не удалось открыть: {ex.Message}");
         }
     }
 
@@ -94,16 +92,15 @@ public class MainViewModel : ObservableObject
 
     private void RemoveQuickLink(object parameter)
     {
-        if (parameter is QuickLinkViewModel link)
-        {
-            QuickLinks.Remove(link);
-        }
+        if (parameter is not QuickLinkViewModel link) return;
+        QuickLinks.Remove(link);
     }
 
     private bool CanRemoveQuickLink(object parameter) => parameter != null;
 
     private void MinimizeToTray(object parameter)
     {
-        Application.Current.MainWindow.Hide();
+        if (Application.Current.MainWindow != null) 
+            Application.Current.MainWindow.Hide();
     }
 }
