@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Pet.SwiftLink.Desktop" 
              xmlns:local1="clr-namespace:Pet.SwiftLink.Desktop.Converters"
-             StartupUri="MainWindow.xaml">
+             xmlns:viewModels="clr-namespace:Pet.SwiftLink.Desktop.ViewModels"
+             StartupUri="/Views/MainWindow.xaml">
     <Application.Resources>
         <local1:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <viewModels:ViewModelLocator x:Key="Locator"/>
     </Application.Resources>
 </Application>
