@@ -1,0 +1,30 @@
+# Ignore all log files
+*.log
+
+# Ignore all temporary files
+*.tmp
+
+# Ignore all user-specific files
+*.user
+
+# Ignore all backup files
+*.bak
+
+# Ignore all compiled files
+*.dll
+*.exe
+*.pdb
+
+# Ignore all database files
+*.sdf
+*.mdf
+
+# Ignore all Visual Studio files
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+*.ncb
+*.opensdf
+*.opensdf
+*.VC.db
