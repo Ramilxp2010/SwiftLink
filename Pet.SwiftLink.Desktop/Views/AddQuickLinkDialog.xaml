@@ -1,0 +1,39 @@
+﻿<Window x:Class="Pet.SwiftLink.Desktop.AddQuickLinkDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Pet.SwiftLink.Desktop"
+        mc:Ignorable="d"
+        Title="AddQuickLinkDialog" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Тип:" Grid.Row="0"/>
+        <ComboBox x:Name="TypeComboBox" Grid.Row="1" Margin="0,0,0,10">
+            <ComboBoxItem Content="Папка" Tag="Folder"/>
+            <ComboBoxItem Content="Файл" Tag="File"/>
+            <ComboBoxItem Content="Приложение" Tag="Application"/>
+        </ComboBox>
+
+        <TextBlock Text="Название:" Grid.Row="2"/>
+        <TextBox x:Name="NameTextBox" Grid.Row="3" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Путь:" Grid.Row="4"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="5">
+            <TextBox x:Name="PathTextBox" Width="250" Margin="0,0,10,0"/>
+            <Button Content="..." Width="30" Click="BrowseButton_Click"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="6">
+            <Button Content="Добавить" Width="80" Margin="0,0,10,0" Click="AddButton_Click"/>
+            <Button Content="Отмена" Width="80" Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,10 @@
+﻿<Application x:Class="Pet.SwiftLink.Desktop.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Pet.SwiftLink.Desktop" 
+             xmlns:local1="clr-namespace:Pet.SwiftLink.Desktop.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <local1:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+    </Application.Resources>
+</Application>
