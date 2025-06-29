@@ -35,6 +35,7 @@
       <XamlRuntime>Wpf</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
+    <Page Remove="Views\Window1.xaml" />
   </ItemGroup>
 
   <ItemGroup>
