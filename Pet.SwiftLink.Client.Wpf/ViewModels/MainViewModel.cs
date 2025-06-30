@@ -13,6 +13,7 @@ namespace Pet.SwiftLink.Desktop.ViewModels;
 public class MainViewModel : ObservableObject
 {
     private readonly IDialogService _dialogService;
+    private readonly IStatisticTracker _statisticTracker;
     private QuickLinkViewModel _selectedLink;
     private const string DataFilePath = "quicklinks.json";
 
@@ -29,10 +30,11 @@ public class MainViewModel : ObservableObject
     public ICommand RemoveQuickLinkCommand { get; }
     public ICommand MinimizeToTrayCommand { get; }
 
-    public MainViewModel(IDialogService dialogService)
+    public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker)
     {
         _dialogService = dialogService;
-
+        _statisticTracker = statisticTracker;
+        
         // Инициализация команд
         AddQuickLinkCommand = new RelayCommand(AddQuickLink);
         OpenQuickLinkCommand = new RelayCommand(OpenQuickLink, CanOpenQuickLink);
@@ -52,7 +54,8 @@ public class MainViewModel : ObservableObject
                 return;
 
             QuickLinks.Clear();
-            foreach (var link in links) QuickLinks.Add(new QuickLinkViewModel(link));
+            var ordered = _statisticTracker.OrderByPopularity(links).Result;
+            foreach (var link in ordered) QuickLinks.Add(new QuickLinkViewModel(link));
         }
     }
 
@@ -76,6 +79,7 @@ public class MainViewModel : ObservableObject
         if (parameter is not QuickLinkViewModel link) return;
         try
         {
+            _statisticTracker.TrackClickAsync(link.Model.Id);
             System.Diagnostics.Process.Start(new ProcessStartInfo
             {
                 FileName = link.Path,

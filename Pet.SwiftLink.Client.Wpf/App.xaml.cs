@@ -4,7 +4,10 @@ using System.Windows;
 using Pet.SwiftLink.Desktop.ViewModels;
 using Pet.SwiftLink.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Pet.SwiftLink.Contract.Interfaces;
 using Pet.SwiftLink.Desktop.Services;
+using Pet.SwiftLink.Infrastructure.Extensions;
+using Pet.SwiftLink.Ranging.Extensions;
 
 namespace Pet.SwiftLink.Desktop
 {
@@ -23,11 +26,26 @@ namespace Pet.SwiftLink.Desktop
             var mainWindow = new MainWindow();
             mainWindow.Show();
         }
-
+        
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<MainViewModel>();
+
+            services.AddRepository();
+            services.AddRanging();
+            
+            services.AddSingleton<IStatisticTracker, WpfStatisticTracker>();
+        }
+        
+        protected override void OnExit(ExitEventArgs e)
+        {
+            var repo = Services?.GetService<ILinkRankRepository>();
+            if (repo is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+            base.OnExit(e);
         }
     }
 
