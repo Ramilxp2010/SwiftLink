@@ -12,6 +12,8 @@ namespace Pet.SwiftLink.Desktop.ViewModels;
 
 public class MainViewModel : ObservableObject
 {
+    private readonly TrayIconViewModel _trayIconViewModel;
+    
     private readonly IDialogService _dialogService;
     private readonly IStatisticTracker _statisticTracker;
     private QuickLinkViewModel _selectedLink;
@@ -32,6 +34,8 @@ public class MainViewModel : ObservableObject
 
     public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker)
     {
+        _trayIconViewModel = new TrayIconViewModel(ShowWindow, CloseApplication);
+
         _dialogService = dialogService;
         _statisticTracker = statisticTracker;
         
@@ -39,7 +43,7 @@ public class MainViewModel : ObservableObject
         AddQuickLinkCommand = new RelayCommand(AddQuickLink);
         OpenQuickLinkCommand = new RelayCommand(OpenQuickLink, CanOpenQuickLink);
         RemoveQuickLinkCommand = new RelayCommand(RemoveQuickLink, CanRemoveQuickLink);
-        MinimizeToTrayCommand = new RelayCommand(MinimizeToTray);
+        MinimizeToTrayCommand = new RelayCommand(_ => MinimizeToTray());
 
         LoadQuickLinks();
     }
@@ -102,9 +106,20 @@ public class MainViewModel : ObservableObject
 
     private bool CanRemoveQuickLink(object parameter) => parameter != null;
 
-    private void MinimizeToTray(object parameter)
+    private void ShowWindow()
     {
-        if (Application.Current.MainWindow != null) 
-            Application.Current.MainWindow.Hide();
+        Application.Current.MainWindow.Show();
+        Application.Current.MainWindow.WindowState = WindowState.Normal;
+    }
+
+    private void MinimizeToTray()
+    {
+        Application.Current.MainWindow.Hide();
+    }
+
+    private void CloseApplication()
+    {
+        _trayIconViewModel.Dispose();
+        Application.Current.Shutdown();
     }
 }
