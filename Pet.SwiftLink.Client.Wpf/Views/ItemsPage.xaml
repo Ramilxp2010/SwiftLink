@@ -40,7 +40,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="10*"/>
-
+        </Grid.RowDefinitions>
+        
         <!-- Панель инструментов -->
         <Border Grid.Row="0"
                 Background="{StaticResource PrimaryBackground}" 
