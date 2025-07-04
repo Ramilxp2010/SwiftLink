@@ -75,7 +75,7 @@
             <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="10"
                           VerticalScrollBarVisibility="Disabled">
                 <ItemsControl x:Name="CardList" ItemsSource="{Binding QuickLinks}" 
-                              ToolTipService.ToolTip="{Binding Path}>
+                              ToolTipService.ToolTip="{Binding Path}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" />
