@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Pet.SwiftLink.Desktop"
         xmlns:viewModels="clr-namespace:Pet.SwiftLink.Desktop.ViewModels"
         xmlns:model="clr-namespace:Pet.SwiftLink.Contract.Model;assembly=Pet.SwiftLink.Contract"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
         Title="AddQuickLinkDialog" Height="450" Width="800">
     <Window.DataContext>
@@ -40,7 +41,7 @@
             <TextBox Width="300" 
                      Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
                     />
-            <Button Content="..." Width="30" Margin="5,0,0,0"
+            <ui:Button Appearance="Dark" Content="..." Width="30" Margin="5,0,0,0"
                     Command="{Binding BrowseCommand}"/>
         </StackPanel>
 

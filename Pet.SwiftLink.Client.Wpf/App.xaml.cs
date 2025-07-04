@@ -8,6 +8,8 @@ using Pet.SwiftLink.Contract.Interfaces;
 using Pet.SwiftLink.Desktop.Services;
 using Pet.SwiftLink.Infrastructure.Extensions;
 using Pet.SwiftLink.Ranging.Extensions;
+using Wpf.Ui;
+using Wpf.Ui.DependencyInjection;
 
 namespace Pet.SwiftLink.Desktop
 {
@@ -23,13 +25,15 @@ namespace Pet.SwiftLink.Desktop
             ConfigureServices(services);
             Services = services.BuildServiceProvider();
 
-            var mainWindow = new MainWindow();
+            var mainWindow = Services.GetRequiredService<Window1>();
             mainWindow.Show();
         }
         
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IContentDialogService, ContentDialogService>();
+            services.AddSingleton<Window1>();
             services.AddSingleton<MainViewModel>();
 
             services.AddRepository();

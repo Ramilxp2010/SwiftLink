@@ -7,6 +7,10 @@ using Newtonsoft.Json;
 using Pet.SwiftLink.Contract.Model;
 using Pet.SwiftLink.Desktop.Commands;
 using Pet.SwiftLink.Desktop.Services;
+using Wpf.Ui;
+using Wpf.Ui.Abstractions.Controls;
+using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace Pet.SwiftLink.Desktop.ViewModels;
 
@@ -16,6 +20,9 @@ public class MainViewModel : ObservableObject
     
     private readonly IDialogService _dialogService;
     private readonly IStatisticTracker _statisticTracker;
+
+    private readonly IContentDialogService _contentDialogService;
+
     private QuickLinkViewModel _selectedLink;
     private const string DataFilePath = "quicklinks.json";
 
@@ -27,25 +34,54 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _selectedLink, value);
     }
 
+    private string? _dialogResultText = string.Empty;
+    public string? DialogResultText
+    {
+        get => _dialogResultText;
+        set => SetProperty(ref _dialogResultText, value);
+    }
+
     public ICommand AddQuickLinkCommand { get; }
     public ICommand OpenQuickLinkCommand { get; }
     public ICommand RemoveQuickLinkCommand { get; }
     public ICommand MinimizeToTrayCommand { get; }
+    public ICommand ShowDialogCommand { get; }
 
-    public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker)
+    public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker, IContentDialogService contentDialogService)
     {
         _trayIconViewModel = new TrayIconViewModel(ShowWindow, CloseApplication);
 
         _dialogService = dialogService;
         _statisticTracker = statisticTracker;
-        
+        _contentDialogService = contentDialogService;
+
         // Инициализация команд
         AddQuickLinkCommand = new RelayCommand(AddQuickLink);
         OpenQuickLinkCommand = new RelayCommand(OpenQuickLink, CanOpenQuickLink);
         RemoveQuickLinkCommand = new RelayCommand(RemoveQuickLink, CanRemoveQuickLink);
         MinimizeToTrayCommand = new RelayCommand(_ => MinimizeToTray());
+        ShowDialogCommand = new RelayCommand(async (obj) => await OnShowDialog(obj));
 
         LoadQuickLinks();
+    }
+
+    private async Task OnShowDialog(object obj)
+    {
+        ContentDialogResult result = await _contentDialogService.ShowSimpleDialogAsync(
+            new SimpleContentDialogCreateOptions()
+            {
+                Title = "Добавить папку в быстрый доступ",
+                Content = obj,
+                PrimaryButtonText = "Добавить",
+                CloseButtonText = "Отмена",
+            }
+        );
+
+        DialogResultText = result switch
+        {
+            ContentDialogResult.Primary => "Добавлено",
+            _ => "Ничего не добавлено!",
+        };
     }
 
     private void LoadQuickLinks()
