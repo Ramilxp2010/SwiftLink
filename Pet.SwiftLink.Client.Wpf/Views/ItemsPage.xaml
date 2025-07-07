@@ -8,9 +8,9 @@
         xmlns:viewModels="clr-namespace:Pet.SwiftLink.Desktop.ViewModels"
         d:DesignHeight="450"
         d:DesignWidth="800"
+        ScrollViewer.CanContentScroll="False"
         mc:Ignorable="d">
-
-
+    
     <Page.Resources>
         <ResourceDictionary>
             <StackPanel x:Key="DialogContent">
@@ -29,19 +29,17 @@
                     Command="{Binding BrowseCommand}"/>
                 </StackPanel>
             </StackPanel>
-            
         </ResourceDictionary>
     </Page.Resources>
-
-
+    
     <Grid 
         Background="Gray">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="10*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        
+
         <!-- Панель инструментов -->
         <Border Grid.Row="0"
                 Background="{StaticResource PrimaryBackground}" 
@@ -49,20 +47,27 @@
                 CornerRadius="8">
             <StackPanel Orientation="Horizontal" Margin="10">
                 <StackPanel Orientation="Horizontal">
-                    <ui:Button Appearance="Primary" Icon="{ui:SymbolIcon BookmarkAdd20, Filled=True}"
-                        Command="{Binding ShowDialogCommand}"
-                        CommandParameter="{StaticResource DialogContent}"
-                        Content="Добавить" />
-
-                    <TextBlock
-                        Margin="15,0,0,0"
-                        VerticalAlignment="Center"
-                        FontSize="14"
-                        Text="{Binding DialogResultText}" />
+                    <ui:Button Appearance="Success"
+                        Command="{Binding ShowDialogCommand}" CommandParameter="{StaticResource DialogContent}" 
+                        Icon="{ui:SymbolIcon Add32, Filled=False}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ToolTip="Добавить"/>
                 </StackPanel>
-                <ui:Button Appearance="Primary" Content="Удалить" Command="{Binding RemoveQuickLinkCommand}" 
-                        CommandParameter="{Binding SelectedLink}" Margin="5"/>
-                <ui:Button Appearance="Primary" Content="Свернуть в трей" Command="{Binding MinimizeToTrayCommand}" Margin="5"/>
+
+                <ui:Button Appearance="Danger" Margin="5"
+                    Command="{Binding RemoveQuickLinkCommand}" CommandParameter="{Binding SelectedLink}"  
+                    Icon="{ui:SymbolIcon Delete32, Filled=False}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTip="Удалить"/>
+
+                <ui:Button Appearance="Success" Command="{Binding MinimizeToTrayCommand}" Margin="5"
+                    Icon="{ui:SymbolIcon ArrowMinimize28, Filled=False}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTip="Свернуть"/>
+
             </StackPanel>
         </Border>
         <ContentPresenter x:Name="ContentPresenterForDialogs" Grid.Row="0" />
@@ -71,140 +76,154 @@
                 Background="{StaticResource PrimaryBackground}" 
                 Margin="8 8 8 0"
                 CornerRadius="8">
-            
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="10"
-                          VerticalScrollBarVisibility="Disabled">
-                <ItemsControl x:Name="CardList" ItemsSource="{Binding QuickLinks}" 
-                              ToolTipService.ToolTip="{Binding Path}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="200" Height="150" Margin="8"
-                            Style="{StaticResource HoverableCardStyle}"
-                            Background="#FFE08C"
-                            CornerRadius="12"
-                            BorderBrush="#808080"
-                            BorderThickness="1">
+            <StackPanel>
+                <ui:TextBlock Appearance="Primary" Text="Favorites" FontTypography="Title" Margin="25 5 0 0"/>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="10 0 0 5"
+                              VerticalScrollBarVisibility="Disabled">
+                    <ui:ListView x:Name="CardList" ItemsSource="{Binding QuickLinks}" SelectedItem="{Binding SelectedLink}">
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger EventName="MouseDoubleClick">
+                                <b:InvokeCommandAction Command="{Binding OpenQuickLinkCommand}"
+                                               CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
 
-                                <Border.RenderTransform>
-                                    <TranslateTransform x:Name="cardTransform" Y="0"/>
-                                </Border.RenderTransform>
-                                <Border.Effect>
-                                    <DropShadowEffect x:Name="cardShadow" Direction="270" BlurRadius="6" ShadowDepth="2" Color="Black" Opacity="0.15"/>
-                                </Border.Effect>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="2.5*"/>
-                                        <RowDefinition Height="1.2*"/>
-                                        <RowDefinition Height="3*"/>
-                                    </Grid.RowDefinitions>
-                                    <!-- Верхняя часть -->
-                                    <Grid Margin="10 10 0 0" Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
 
-                                        <!-- Иконка -->
-                                        <ui:SymbolIcon Grid.Column="0" Margin="0 5" VerticalAlignment="Top" FontSize="20" Symbol="Folder48" 
-                                               Foreground="{StaticResource PrimaryBlack}" 
-                                               Filled="False"
-                                               >
-                                            <ui:SymbolIcon.Effect>
-                                                <DropShadowEffect Color="{StaticResource PrimaryBlackColor}"
-                                          BlurRadius="3"
-                                          ShadowDepth="0"
-                                          Opacity="1"/>
-                                            </ui:SymbolIcon.Effect>
-                                        </ui:SymbolIcon>
+                                <Border Width="200" Height="150" Margin="8" ToolTipService.ToolTip="{Binding Path}"
+                                Style="{StaticResource HoverableCardStyle}"
+                                Background="#FFE08C"
+                                CornerRadius="12"
+                                BorderBrush="#808080"
+                                BorderThickness="1">
 
-                                        <ui:SymbolIcon Grid.Column="1" Margin="5" VerticalAlignment="Top" FontSize="20" Symbol="Star48" 
+                                    <Border.RenderTransform>
+                                        <TranslateTransform x:Name="cardTransform" Y="0"/>
+                                    </Border.RenderTransform>
+                                    <Border.Effect>
+                                        <DropShadowEffect x:Name="cardShadow" Direction="270" BlurRadius="6" ShadowDepth="2" Color="Black" Opacity="0.15"/>
+                                    </Border.Effect>
+
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="2.5*"/>
+                                            <RowDefinition Height="1.2*"/>
+                                            <RowDefinition Height="3*"/>
+                                        </Grid.RowDefinitions>
+                                        <!-- Верхняя часть -->
+                                        <Grid Margin="10 10 0 0" Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Иконка -->
+                                            <ui:SymbolIcon Grid.Column="0" Margin="0 5" VerticalAlignment="Top" FontSize="20" Symbol="Folder48" 
                                                    Foreground="{StaticResource PrimaryBlack}" 
                                                    Filled="False"
                                                    >
-                                            <ui:SymbolIcon.Effect>
-                                                <DropShadowEffect Color="{StaticResource PrimaryBlackColor}"
+                                                <ui:SymbolIcon.Effect>
+                                                    <DropShadowEffect Color="{StaticResource PrimaryBlackColor}"
                                               BlurRadius="3"
                                               ShadowDepth="0"
                                               Opacity="1"/>
-                                            </ui:SymbolIcon.Effect>
-                                        </ui:SymbolIcon>
+                                                </ui:SymbolIcon.Effect>
+                                            </ui:SymbolIcon>
 
-                                        <!-- Кнопка действий -->
-                                        <Button Content="⋮"
-                                        Width="28" Height="28"
-                                        FontSize="14"
-                                        Grid.Column="2"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Top"
-                                        Background="Transparent"
-                                        Foreground="{StaticResource PrimaryBlack}"
-                                        BorderThickness="0"
-                                        ToolTip="Действия"/>
+                                            <ui:SymbolIcon Grid.Column="1" Margin="5" VerticalAlignment="Top" FontSize="20" Symbol="Star48" 
+                                                       Foreground="{StaticResource PrimaryBlack}" 
+                                                       Filled="False"
+                                                       >
+                                                <ui:SymbolIcon.Effect>
+                                                    <DropShadowEffect Color="{StaticResource PrimaryBlackColor}"
+                                                  BlurRadius="3"
+                                                  ShadowDepth="0"
+                                                  Opacity="1"/>
+                                                </ui:SymbolIcon.Effect>
+                                            </ui:SymbolIcon>
+
+                                            <!-- Кнопка действий -->
+                                            <Button Content="⋮"
+                                            Width="28" Height="28"
+                                            FontSize="14"
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Top"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            ToolTip="Действия"
+                                            Foreground="{StaticResource PrimaryBlack}"/>
+                                        </Grid>
+
+                                        <!-- Нижний текст -->
+                                        <TextBlock Text="{Binding Name}" Grid.Row="1"
+                                           VerticalAlignment="Bottom"
+                                           Margin="10 0 0 0"
+                                           Padding="0 0 0 10"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource DarkText}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+
+                                        <!-- Нижний текст -->
+                                        <ui:TextBlock Grid.Row="2"
+                                           VerticalAlignment="Bottom"
+                                           Margin="10 0 10 10"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding Path}"
+                                           FontTypography="BodyStrong" Appearance="Secondary"/>
                                     </Grid>
 
-                                    <!-- Нижний текст -->
-                                    <TextBlock Text="{Binding Name}" Grid.Row="1"
-                                       VerticalAlignment="Bottom"
-                                       Margin="10 0 0 0"
-                                       Padding="0 0 0 10"
-                                       TextWrapping="Wrap"
-                                       Foreground="{StaticResource DarkText}"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"/>
-
-                                    <!-- Нижний текст -->
-                                    <ui:TextBlock Grid.Row="2"
-                                       VerticalAlignment="Bottom"
-                                       Margin="10 0 10 10"
-                                       TextWrapping="Wrap"
-                                       Text="{Binding Path}"
-                                       FontTypography="BodyStrong" Appearance="Secondary"/>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ui:ListView>
+                </ScrollViewer>
+            </StackPanel>
         </Border>
 
         <Border Grid.Row="2" 
                 Background="{StaticResource PrimaryBackground}" 
                 Margin="8"
                 CornerRadius="8">
-            
-        <!-- Список быстрых ссылок -->
-        <ui:ListView Grid.Row="2" ItemsSource="{Binding QuickLinks}" Margin="10"
-                  SelectedItem="{Binding SelectedLink}">
-            <b:Interaction.Triggers>
-                <b:EventTrigger EventName="MouseDoubleClick">
-                    <b:InvokeCommandAction Command="{Binding OpenQuickLinkCommand}"
-                                           CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListView}}"/>
-                </b:EventTrigger>
-            </b:Interaction.Triggers>
-            <ui:ListView.ItemTemplate>
-                <DataTemplate>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40px"/>
-                            <ColumnDefinition Width="300px"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <ui:SymbolIcon Symbol="Folder32" Margin="0 0 8 0" Grid.Column="0"/>
-                        <ui:TextBlock Grid.Column="1" Appearance="Primary" Text="{Binding Name}" ToolTipService.ToolTip="{Binding Path}"></ui:TextBlock>
-                        <ui:TextBlock Grid.Column="2" Appearance="Secondary" Text="{Binding Path}" ToolTipService.ToolTip="{Binding Path}"></ui:TextBlock>
-                    </Grid>
-                    
-                </DataTemplate>
-            </ui:ListView.ItemTemplate>
+            <ui:ListView x:Name="QuickList" 
+                         ItemsSource="{Binding QuickLinks}"
+                         SelectedItem="{Binding SelectedLink}"  
+                         Margin="10"
+                         ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                         ScrollViewer.CanContentScroll="False">
+
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="MouseDoubleClick">
+                        <b:InvokeCommandAction Command="{Binding OpenQuickLinkCommand}"
+                               CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+
+                <ui:ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40px"/>
+                                <ColumnDefinition Width="300px"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ui:SymbolIcon Symbol="Folder32" Margin="0 0 8 0" Grid.Column="0"/>
+                            <ui:TextBlock Grid.Column="1" Appearance="Primary" Text="{Binding Name}" ToolTipService.ToolTip="{Binding Path}"></ui:TextBlock>
+                            <ui:TextBlock Grid.Column="2" Appearance="Secondary" Text="{Binding Path}" ToolTipService.ToolTip="{Binding Path}"></ui:TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ui:ListView.ItemTemplate>
             </ui:ListView>
         </Border>
     </Grid>
