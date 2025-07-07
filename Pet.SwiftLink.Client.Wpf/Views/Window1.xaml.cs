@@ -27,6 +27,9 @@ namespace Pet.SwiftLink.Desktop.Views
         {
             InitializeComponent();
             contentDialogService.SetDialogHost(RootContentDialog);
+
+            Loaded += (_, _) => RootNavigation.Navigate(typeof(ItemPage));
+
         }
     }
 }

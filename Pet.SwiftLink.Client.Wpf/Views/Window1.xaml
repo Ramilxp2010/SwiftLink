@@ -8,11 +8,12 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d" Height="450" Width="800">
     <Grid>
-        <ui:NavigationView IsBackButtonVisible="Auto"  x:Name="RootNavigation" 
-                       PaneTitle="Menu">
-            <ui:NavigationView.AutoSuggestBox>
-                <ui:AutoSuggestBox Margin="8,0,8,8" PlaceholderText="Search" />
-            </ui:NavigationView.AutoSuggestBox>
+        <ui:NavigationView 
+            IsBackButtonVisible="Auto"  
+            x:Name="RootNavigation"
+            PaneTitle="Menu"
+            PaneDisplayMode="LeftFluent"
+            >
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem 
                     Content="Home"

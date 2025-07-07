@@ -1,8 +1,7 @@
-using System.Windows;
-using System.Windows.Input;
 using Microsoft.Win32;
 using Pet.SwiftLink.Contract.Model;
 using Pet.SwiftLink.Desktop.Commands;
+using System.Windows.Input;
 
 namespace Pet.SwiftLink.Desktop.ViewModels
 {
@@ -33,17 +32,15 @@ namespace Pet.SwiftLink.Desktop.ViewModels
         }
 
         public ICommand BrowseCommand { get; }
-        public ICommand AddCommand { get; }
-        public ICommand CancelCommand { get; }
 
         public AddQuickLinkDialogViewModel()
         {
             BrowseCommand = new RelayCommand(Browse);
-            AddCommand = new RelayCommand(Add, CanAdd);
-            CancelCommand = new RelayCommand(Cancel);
         }
 
-        private void Browse(object parameter)
+        public event EventHandler<QuickLink>? Confirmed;
+
+        public void Browse(object parameter)
         {
             if (SelectedType == QuickLinkType.Folder)
             {
@@ -59,12 +56,7 @@ namespace Pet.SwiftLink.Desktop.ViewModels
                 Path = dialog.FileName;
                 Name = string.IsNullOrWhiteSpace(Name) ? System.IO.Path.GetFileNameWithoutExtension(Path) : Name;
             }
-        }
 
-        private bool CanAdd(object parameter) => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Path);
-
-        private void Add(object parameter)
-        {
             Result = new QuickLink
             {
                 Name = Name,
@@ -72,16 +64,8 @@ namespace Pet.SwiftLink.Desktop.ViewModels
                 Type = SelectedType
             };
 
-            CloseDialog(true);
+            Confirmed?.Invoke(this, Result);
         }
 
-        private void Cancel(object parameter) => CloseDialog(false);
-
-        private void CloseDialog(bool dialogResult)
-        {
-            var window = Application.Current.Windows.OfType<Window>()
-                .FirstOrDefault(w => w.DataContext == this);
-            window?.Close();
-        }
     }
 }

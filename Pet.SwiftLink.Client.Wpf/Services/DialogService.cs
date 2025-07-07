@@ -9,7 +9,8 @@ public class DialogService : IDialogService
     public QuickLink ShowAddQuickLinkDialog()
     {
         var dialog = new AddQuickLinkDialog();
-        return dialog.ShowDialog() == false ? dialog.QuickLink : null;
+        //return dialog.ShowDialog() == false ? dialog.QuickLink : null;
+        return null;
     }
 
     public void ShowError(string message)

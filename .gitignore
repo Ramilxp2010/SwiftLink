@@ -337,3 +337,5 @@ FodyWeavers.xsd
 *.seed
 *.pid.lock
 *.tsbuildinfo
+/Pet.SwiftLink.Client.Wpf/Views/ExperementalPage.xaml
+/Pet.SwiftLink.Client.Wpf/Views/ExperementalPage.xaml.cs

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Pet.SwiftLink.Contract.Model;
 using Pet.SwiftLink.Desktop.Commands;
 using Pet.SwiftLink.Desktop.Services;
+using Pet.SwiftLink.Desktop.Views;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions.Controls;
 using Wpf.Ui.Controls;
@@ -45,7 +46,6 @@ public class MainViewModel : ObservableObject
     public ICommand OpenQuickLinkCommand { get; }
     public ICommand RemoveQuickLinkCommand { get; }
     public ICommand MinimizeToTrayCommand { get; }
-    public ICommand ShowDialogCommand { get; }
 
     public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker, IContentDialogService contentDialogService)
     {
@@ -56,26 +56,36 @@ public class MainViewModel : ObservableObject
         _contentDialogService = contentDialogService;
 
         // Инициализация команд
-        AddQuickLinkCommand = new RelayCommand(AddQuickLink);
         OpenQuickLinkCommand = new RelayCommand(OpenQuickLink, CanOpenQuickLink);
         RemoveQuickLinkCommand = new RelayCommand(RemoveQuickLink, CanRemoveQuickLink);
         MinimizeToTrayCommand = new RelayCommand(_ => MinimizeToTray());
-        ShowDialogCommand = new RelayCommand(async (obj) => await OnShowDialog(obj));
+        AddQuickLinkCommand = new RelayCommand(async _ => await OnShowDialog());
 
         LoadQuickLinks();
     }
 
-    private async Task OnShowDialog(object obj)
+    private async Task OnShowDialog()
     {
+        var addQuickLinkDialog = new AddQuickLinkDialog();
+
+        ((AddQuickLinkDialogViewModel)addQuickLinkDialog.DataContext).Confirmed += (s, link) =>
+        {
+            if (link != null)
+            {
+                QuickLinks.Add(new QuickLinkViewModel(link));
+            }
+        };
+
         ContentDialogResult result = await _contentDialogService.ShowSimpleDialogAsync(
             new SimpleContentDialogCreateOptions()
             {
                 Title = "Добавить папку в быстрый доступ",
-                Content = obj,
+                Content = addQuickLinkDialog,
                 PrimaryButtonText = "Добавить",
                 CloseButtonText = "Отмена",
             }
         );
+
 
         DialogResultText = result switch
         {
@@ -103,15 +113,6 @@ public class MainViewModel : ObservableObject
     {
         string json = JsonConvert.SerializeObject(QuickLinks.Select(x=>x.Model).ToList());
         File.WriteAllText(DataFilePath, json);
-    }
-
-    private void AddQuickLink(object parameter)
-    {
-        var result = _dialogService.ShowAddQuickLinkDialog();
-        if (result != null)
-        {
-            QuickLinks.Add(new QuickLinkViewModel(result));
-        }
     }
 
     private void OpenQuickLink(object parameter)
