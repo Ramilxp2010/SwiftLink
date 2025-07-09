@@ -59,6 +59,7 @@ namespace Pet.SwiftLink.Desktop.ViewModels
 
             Result = new QuickLink
             {
+                Id = Guid.NewGuid(),
                 Name = Name,
                 Path = Path,
                 Type = SelectedType

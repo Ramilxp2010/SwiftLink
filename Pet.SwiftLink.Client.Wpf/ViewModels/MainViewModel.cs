@@ -1,15 +1,13 @@
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Input;
-using Newtonsoft.Json;
+using Pet.SwiftLink.Contract.Interfaces;
 using Pet.SwiftLink.Contract.Model;
 using Pet.SwiftLink.Desktop.Commands;
 using Pet.SwiftLink.Desktop.Services;
 using Pet.SwiftLink.Desktop.Views;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Input;
 using Wpf.Ui;
-using Wpf.Ui.Abstractions.Controls;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
 
@@ -21,11 +19,11 @@ public class MainViewModel : ObservableObject
     
     private readonly IDialogService _dialogService;
     private readonly IStatisticTracker _statisticTracker;
+    private readonly ISwiftLinkService _linkService;
 
     private readonly IContentDialogService _contentDialogService;
 
     private QuickLinkViewModel _selectedLink;
-    private const string DataFilePath = "quicklinks.json";
 
     public ObservableCollection<QuickLinkViewModel> QuickLinks { get; } = new();
     
@@ -47,15 +45,15 @@ public class MainViewModel : ObservableObject
     public ICommand RemoveQuickLinkCommand { get; }
     public ICommand MinimizeToTrayCommand { get; }
 
-    public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker, IContentDialogService contentDialogService)
+    public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker, IContentDialogService contentDialogService, ISwiftLinkService linkService)
     {
         _trayIconViewModel = new TrayIconViewModel(ShowWindow, CloseApplication);
 
         _dialogService = dialogService;
         _statisticTracker = statisticTracker;
         _contentDialogService = contentDialogService;
+        _linkService = linkService;
 
-        // Инициализация команд
         OpenQuickLinkCommand = new RelayCommand(OpenQuickLink, CanOpenQuickLink);
         RemoveQuickLinkCommand = new RelayCommand(RemoveQuickLink, CanRemoveQuickLink);
         MinimizeToTrayCommand = new RelayCommand(_ => MinimizeToTray());
@@ -73,6 +71,7 @@ public class MainViewModel : ObservableObject
             if (link != null)
             {
                 QuickLinks.Add(new QuickLinkViewModel(link));
+                SaveQuickLink(link);
             }
         };
 
@@ -96,23 +95,24 @@ public class MainViewModel : ObservableObject
 
     private void LoadQuickLinks()
     {
-        if (File.Exists(DataFilePath))
-        {
-            string json = File.ReadAllText(DataFilePath);
-            var links = JsonConvert.DeserializeObject<List<QuickLink>>(json);
-            if (links == null)
-                return;
+        var links = _linkService.GetQuickLinks();
+        if (links == null)
+            return;
 
-            QuickLinks.Clear();
-            var ordered = _statisticTracker.OrderByPopularity(links).Result;
-            foreach (var link in ordered) QuickLinks.Add(new QuickLinkViewModel(link));
-        }
+        QuickLinks.Clear();
+        var ordered = _statisticTracker.OrderByPopularity(links).Result;
+        foreach (var link in ordered) QuickLinks.Add(new QuickLinkViewModel(link));
     }
 
     private void SaveQuickLinks()
     {
-        string json = JsonConvert.SerializeObject(QuickLinks.Select(x=>x.Model).ToList());
-        File.WriteAllText(DataFilePath, json);
+        var links = QuickLinks.Select(x => x.Model);
+        _linkService.RecordAsync(links);
+    }
+    
+    private void SaveQuickLink(QuickLink link)
+    {
+        _linkService.RecordAsync(link);
     }
 
     private void OpenQuickLink(object parameter)
@@ -156,6 +156,7 @@ public class MainViewModel : ObservableObject
 
     private void CloseApplication()
     {
+        SaveQuickLinks();
         _trayIconViewModel.Dispose();
         Application.Current.Shutdown();
     }

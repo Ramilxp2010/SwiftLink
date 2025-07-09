@@ -1,15 +1,12 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using Pet.SwiftLink.Desktop.ViewModels;
-using Pet.SwiftLink.Desktop.Views;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Pet.SwiftLink.Contract.Interfaces;
 using Pet.SwiftLink.Desktop.Services;
+using Pet.SwiftLink.Desktop.ViewModels;
+using Pet.SwiftLink.Desktop.Views;
 using Pet.SwiftLink.Infrastructure.Extensions;
 using Pet.SwiftLink.Ranging.Extensions;
+using System.Windows;
 using Wpf.Ui;
-using Wpf.Ui.DependencyInjection;
 
 namespace Pet.SwiftLink.Desktop
 {
@@ -44,12 +41,23 @@ namespace Pet.SwiftLink.Desktop
         
         protected override void OnExit(ExitEventArgs e)
         {
-            var repo = Services?.GetService<ILinkRankRepository>();
-            if (repo is IDisposable disposable)
+            try
+            {
+                DisposeService<ILinkRankRepository>();
+                DisposeService<ISwiftLinkRepository>();
+            }
+            finally
+            {
+                base.OnExit(e);
+            }
+        }
+
+        private void DisposeService<T>() where T : class 
+        {
+            if (Services?.GetService<T>() is IDisposable disposable) 
             {
                 disposable.Dispose();
             }
-            base.OnExit(e);
         }
     }
 
