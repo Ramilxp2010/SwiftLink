@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Pet.SwiftLink.Desktop"
         xmlns:viewModels="clr-namespace:Pet.SwiftLink.Desktop.ViewModels"
-        xmlns:model="clr-namespace:Pet.SwiftLink.Contract.Model;assembly=Pet.SwiftLink.Contract"
+        xmlns:model="clr-namespace:Pet.SwiftLink.Domain.Model;assembly=Pet.SwiftLink.Domain"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d" Height="450" Width="800">
 

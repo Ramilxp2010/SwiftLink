@@ -1,9 +1,9 @@
 using log4net;
-using log4net.Repository.Hierarchy;
-using Pet.SwiftLink.Contract.Interfaces;
-using Pet.SwiftLink.Contract.Model;
+using Pet.SwiftLink.Application.Interfaces;
+using Pet.SwiftLink.Domain.Interfaces;
+using Pet.SwiftLink.Domain.Model;
 
-namespace Pet.SwiftLink.Ranging.Services;
+namespace Pet.SwiftLink.Application.Services;
 
 public class RankService : IRankService
 {
@@ -19,35 +19,39 @@ public class RankService : IRankService
     {
         try
         {
-            var stat = await _repository.GetOrCreateAsync(itemId);
-            
-            stat.ClickCount++;
-            stat.LastClicked = DateTime.UtcNow;
-            UpdateDailyStats(stat);
-            
-            await _repository.UpdateAsync(stat);
+            var timestamp = DateTime.UtcNow;
+            await _repository.IncrementClickAsync(itemId, timestamp);
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error recording click for item {itemId}");
+            _logger.Error($"Error recording click for item {itemId}", ex);
             throw;
         }
     }
 
     public async Task<IEnumerable<LinkRank>> GetTopItemsAsync(int count)
     {
-        return await _repository.GetTopItemsAsync(count);
+        try
+        {
+            return await _repository.GetTopItemsAsync(count);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Error getting top items (count={count})", ex);
+            throw;
+        }
     }
 
     public async Task<LinkRank> GetItemStatsAsync(Guid itemId)
     {
-        return await _repository.GetOrCreateAsync(itemId);
-    }
-
-    private void UpdateDailyStats(LinkRank stat)
-    {
-        var today = DateTime.UtcNow.Date;
-        stat.DailyStats.TryGetValue(today, out var todayCount);
-        stat.DailyStats[today] = todayCount + 1;
+        try
+        {
+            return await _repository.GetOrCreateAsync(itemId);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Error getting stats for item {itemId}", ex);
+            throw;
+        }
     }
 }

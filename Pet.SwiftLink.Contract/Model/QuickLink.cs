@@ -1,4 +1,4 @@
-﻿namespace Pet.SwiftLink.Contract.Model
+﻿namespace Pet.SwiftLink.Domain.Model
 {
     public class QuickLink
     {

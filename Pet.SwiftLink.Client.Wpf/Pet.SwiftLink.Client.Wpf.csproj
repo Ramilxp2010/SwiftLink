@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pet.SwiftLink.Contract\Pet.SwiftLink.Contract.csproj" />
-    <ProjectReference Include="..\Pet.SwiftLink.Ranging\Pet.SwiftLink.Ranging.csproj" />
+    <ProjectReference Include="..\Pet.SwiftLink.Contract\Pet.SwiftLink.Domain.csproj" />
+    <ProjectReference Include="..\Pet.SwiftLink.Ranging\Pet.SwiftLink.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

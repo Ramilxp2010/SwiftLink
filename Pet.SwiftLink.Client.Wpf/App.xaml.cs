@@ -1,16 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Pet.SwiftLink.Contract.Interfaces;
+using Pet.SwiftLink.Domain.Interfaces;
 using Pet.SwiftLink.Desktop.Services;
 using Pet.SwiftLink.Desktop.ViewModels;
 using Pet.SwiftLink.Desktop.Views;
 using Pet.SwiftLink.Infrastructure.Extensions;
-using Pet.SwiftLink.Ranging.Extensions;
+using Pet.SwiftLink.Application.Extensions;
 using System.Windows;
 using Wpf.Ui;
 
+
 namespace Pet.SwiftLink.Desktop
 {
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public static IServiceProvider? Services { get; private set; }
 

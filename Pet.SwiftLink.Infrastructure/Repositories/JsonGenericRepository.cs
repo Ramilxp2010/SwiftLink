@@ -1,100 +1,133 @@
 ﻿using Newtonsoft.Json;
-using Pet.SwiftLink.Contract.Interfaces;
+using Pet.SwiftLink.Domain.Interfaces;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 
-namespace Pet.SwiftLink.Infrastructure.Repositories
+namespace Pet.SwiftLink.Infrastructure.Repositories;
+
+public abstract class JsonGenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey>, IAsyncDisposable
+    where TKey : notnull
 {
-    public abstract class JsonGenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey>, IDisposable 
-        where TKey:notnull
+    private readonly string _filePath;
+    protected readonly ConcurrentDictionary<TKey, TEntity> DataSource;
+    private readonly Timer _saveTimer;
+    private readonly SemaphoreSlim _fileSemaphore = new(1, 1);
+    private bool _disposed;
+
+    private readonly Func<TEntity, TKey> _keySelector;
+
+    protected JsonGenericRepository(string filePath, Func<TEntity, TKey> keySelector)
     {
-        private readonly string _filePath;
-        protected readonly ConcurrentDictionary<TKey, TEntity> DataSource;
-        private readonly Timer _saveTimer;
-        private readonly object _fileLock = new();
-        private bool _disposed;
+        _filePath = filePath;
+        _keySelector = keySelector;
+        DataSource = LoadDataFromDiskAsync().GetAwaiter().GetResult(); // можно заменить на ленивую загрузку
+        _saveTimer = new Timer(_ => SaveDataToDisk(), null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+    }
 
-        private readonly Func<TEntity, TKey> _keySelector;
+    public abstract void Add(TEntity entity);
 
-        public JsonGenericRepository(string filePath, Func<TEntity, TKey> keySelector)
+    public void Delete(TKey id)
+    {
+        if (!DataSource.TryRemove(id, out _))
         {
-            _filePath = filePath;
-            _keySelector = keySelector;
-            _saveTimer = new Timer(SaveToDisk, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
-
-            DataSource = LoadStatistics();
+            Log($"Entity with key {id} not found for deletion.");
         }
+    }
 
-        public abstract void Add(TEntity entity);
+    public IEnumerable<TEntity> GetAll()
+    {
+        return DataSource.Values;
+    }
 
-        public void Delete(TKey id)
+    public IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate)
+    {
+        return DataSource.Values.AsQueryable().Where(predicate);
+    }
+
+    public TEntity? GetById(TKey id)
+    {
+        return DataSource.TryGetValue(id, out var entity) ? entity : default;
+    }
+
+    public async Task SaveAsync()
+    {
+        if (_disposed) return;
+
+        try
         {
-            DataSource.Remove(id, out var entity);
+            await _fileSemaphore.WaitAsync();
+            var json = JsonConvert.SerializeObject(DataSource.Values.ToList(), Formatting.Indented);
+            await File.WriteAllTextAsync(_filePath, json);
         }
-
-        public IEnumerable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate)
+        catch (Exception ex)
         {
-            return DataSource.Values.ToList().AsQueryable().Where(predicate);
+            Log($"Async save failed: {ex.Message}");
         }
-
-        public IEnumerable<TEntity> GetAll()
+        finally
         {
-            return DataSource.Values;
+            _fileSemaphore.Release();
         }
+    }
 
-        public TEntity? GetById(TKey id)
+    private async Task<ConcurrentDictionary<TKey, TEntity>> LoadDataFromDiskAsync()
+    {
+        try
         {
-            return DataSource[id];
-        }
+            await _fileSemaphore.WaitAsync();
 
-
-        private ConcurrentDictionary<TKey, TEntity> LoadStatistics()
-        {
-            try
-            {
-                lock (_fileLock)
-                {
-                    if (!File.Exists(_filePath))
-                        return new ConcurrentDictionary<TKey, TEntity>();
-
-                    var json = File.ReadAllText(_filePath);
-                    var entities = JsonConvert.DeserializeObject<List<TEntity>>(json);
-                    return new ConcurrentDictionary<TKey, TEntity>(
-                        entities?.ToDictionary(_keySelector) ?? new Dictionary<TKey, TEntity>());
-                }
-            }
-            catch
-            {
+            if (!File.Exists(_filePath))
                 return new ConcurrentDictionary<TKey, TEntity>();
-            }
+
+            var json = File.ReadAllText(_filePath);
+            var entities = JsonConvert.DeserializeObject<List<TEntity>>(json);
+            return new ConcurrentDictionary<TKey, TEntity>(
+                entities?.ToDictionary(_keySelector) ?? new Dictionary<TKey, TEntity>());
         }
-
-
-        private void SaveToDisk(object? state)
+        catch (Exception ex)
         {
-            if (_disposed) return;
-
-            try
-            {
-                lock (_fileLock)
-                {
-                    var json = JsonConvert.SerializeObject(DataSource.Values.ToList());
-                    File.WriteAllText(_filePath, json);
-                }
-            }
-            catch
-            {
-                // Логирование ошибки
-            }
+            Log($"Failed to load data from disk: {ex.Message}");
+            return new ConcurrentDictionary<TKey, TEntity>();
         }
-
-        public void Dispose()
+        finally
         {
-            if (_disposed) return;
-
-            SaveToDisk(null);
-            _saveTimer?.Dispose();
-            _disposed = true;
+            _fileSemaphore.Release();
         }
+    }
+
+    private void SaveDataToDisk()
+    {
+        // Используется таймером: sync-версия
+        if (_disposed) return;
+
+        try
+        {
+            _fileSemaphore.Wait();
+            var json = JsonConvert.SerializeObject(DataSource.Values.ToList(), Formatting.Indented);
+            File.WriteAllText(_filePath, json);
+        }
+        catch (Exception ex)
+        {
+            Log($"Sync save failed: {ex.Message}");
+        }
+        finally
+        {
+            _fileSemaphore.Release();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        _saveTimer?.Dispose();
+        await SaveAsync();
+        _fileSemaphore.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Log(string message)
+    {
+        Console.WriteLine($"[{DateTime.Now}] [JsonRepository] {message}");
     }
 }

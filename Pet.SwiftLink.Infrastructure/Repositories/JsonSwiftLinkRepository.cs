@@ -1,5 +1,5 @@
-﻿using Pet.SwiftLink.Contract.Interfaces;
-using Pet.SwiftLink.Contract.Model;
+﻿using Pet.SwiftLink.Domain.Interfaces;
+using Pet.SwiftLink.Domain.Model;
 
 namespace Pet.SwiftLink.Infrastructure.Repositories
 {

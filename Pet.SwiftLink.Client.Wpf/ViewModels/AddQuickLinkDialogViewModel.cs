@@ -1,5 +1,5 @@
 using Microsoft.Win32;
-using Pet.SwiftLink.Contract.Model;
+using Pet.SwiftLink.Domain.Model;
 using Pet.SwiftLink.Desktop.Commands;
 using System.Windows.Input;
 

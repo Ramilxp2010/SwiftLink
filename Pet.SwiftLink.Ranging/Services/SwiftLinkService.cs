@@ -1,7 +1,8 @@
-﻿using Pet.SwiftLink.Contract.Interfaces;
-using Pet.SwiftLink.Contract.Model;
+﻿using Pet.SwiftLink.Application.Interfaces;
+using Pet.SwiftLink.Domain.Interfaces;
+using Pet.SwiftLink.Domain.Model;
 
-namespace Pet.SwiftLink.Infrastructure.Implementation
+namespace Pet.SwiftLink.Application.Implementation
 {
     public class SwiftLinkService : ISwiftLinkService
     {

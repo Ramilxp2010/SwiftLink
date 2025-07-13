@@ -1,5 +1,5 @@
-using Pet.SwiftLink.Contract.Interfaces;
-using Pet.SwiftLink.Contract.Model;
+using Pet.SwiftLink.Domain.Interfaces;
+using Pet.SwiftLink.Domain.Model;
 
 namespace Pet.SwiftLink.Infrastructure.Repositories;
 
@@ -10,18 +10,28 @@ public class JsonRankRepository : JsonGenericRepository<LinkRank, Guid>, ILinkRa
     {
     }
 
-    public Task<LinkRank> GetOrCreateAsync(Guid itemId)
+    public async Task<LinkRank> GetOrCreateAsync(Guid itemId)
     {
-        return Task.FromResult(DataSource.GetOrAdd(itemId, id => new LinkRank
+        if (DataSource.TryGetValue(itemId, out var existing))
+            return existing;
+
+        var newEntry = new LinkRank
         {
-            ItemId = id,
+            ItemId = itemId,
             ClickCount = 0,
             LastClicked = DateTime.MinValue,
             DailyStats = new Dictionary<DateTime, int>()
-        }));
+        };
+
+        var added = DataSource.GetOrAdd(itemId, newEntry);
+
+        if (ReferenceEquals(added, newEntry))
+            await SaveAsync();
+
+        return added;
     }
 
-    public Task UpdateAsync(LinkRank stat)
+    public async Task UpdateAsync(LinkRank stat)
     {
         DataSource.AddOrUpdate(stat.ItemId, stat, (id, existing) =>
         {
@@ -31,19 +41,53 @@ public class JsonRankRepository : JsonGenericRepository<LinkRank, Guid>, ILinkRa
             return existing;
         });
 
-        return Task.CompletedTask;
+        await SaveAsync();
     }
 
     public Task<IEnumerable<LinkRank>> GetTopItemsAsync(int count)
     {
-        return Task.FromResult(DataSource.Values
+        var top = DataSource.Values
             .OrderByDescending(s => s.ClickCount)
             .Take(count)
-            .AsEnumerable());
+            .AsEnumerable();
+
+        return Task.FromResult(top);
     }
 
     public override void Add(LinkRank entity)
     {
         DataSource.AddOrUpdate(entity.ItemId, entity, (id, old) => entity);
+    }
+
+    public async Task<LinkRank> IncrementClickAsync(Guid itemId, DateTime timestamp)
+    {
+        var today = timestamp.Date;
+
+        var updated = DataSource.AddOrUpdate(itemId,
+            id => new LinkRank
+            {
+                ItemId = id,
+                ClickCount = 1,
+                LastClicked = timestamp,
+                DailyStats = new Dictionary<DateTime, int>
+                {
+                    [today] = 1
+                }
+            },
+            (id, existing) =>
+            {
+                existing.ClickCount++;
+                existing.LastClicked = timestamp;
+
+                if (existing.DailyStats.ContainsKey(today))
+                    existing.DailyStats[today]++;
+                else
+                    existing.DailyStats[today] = 1;
+
+                return existing;
+            });
+
+        await SaveAsync();
+        return updated;
     }
 }

@@ -1,5 +1,5 @@
 using System.Windows.Media;
-using Pet.SwiftLink.Contract.Model;
+using Pet.SwiftLink.Domain.Model;
 
 namespace Pet.SwiftLink.Desktop.ViewModels;
 

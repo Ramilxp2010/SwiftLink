@@ -1,5 +1,5 @@
-using Pet.SwiftLink.Contract.Interfaces;
-using Pet.SwiftLink.Contract.Model;
+using Pet.SwiftLink.Domain.Interfaces;
+using Pet.SwiftLink.Domain.Model;
 using Pet.SwiftLink.Desktop.Commands;
 using Pet.SwiftLink.Desktop.Services;
 using Pet.SwiftLink.Desktop.Views;
@@ -10,6 +10,8 @@ using System.Windows.Input;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
+using Pet.SwiftLink.Application.Interfaces;
+using WinApp = System.Windows.Application;
 
 namespace Pet.SwiftLink.Desktop.ViewModels;
 
@@ -145,19 +147,19 @@ public class MainViewModel : ObservableObject
 
     private void ShowWindow()
     {
-        Application.Current.MainWindow.Show();
-        Application.Current.MainWindow.WindowState = WindowState.Normal;
+        WinApp.Current.MainWindow.Show();
+        WinApp.Current.MainWindow.WindowState = WindowState.Normal;
     }
 
     private void MinimizeToTray()
     {
-        Application.Current.MainWindow.Hide();
+        WinApp.Current.MainWindow.Hide();
     }
 
     private void CloseApplication()
     {
         SaveQuickLinks();
         _trayIconViewModel.Dispose();
-        Application.Current.Shutdown();
+        WinApp.Current.Shutdown();
     }
 }

@@ -1,5 +1,5 @@
 using System.Windows;
-using Pet.SwiftLink.Contract.Model;
+using Pet.SwiftLink.Domain.Model;
 using Pet.SwiftLink.Desktop.Views;
 
 namespace Pet.SwiftLink.Desktop.Services;

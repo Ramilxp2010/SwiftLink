@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Pet.SwiftLink.Contract.Interfaces;
-using Pet.SwiftLink.Infrastructure.Implementation;
+using Pet.SwiftLink.Domain.Interfaces;
 using Pet.SwiftLink.Infrastructure.Repositories;
 
 namespace Pet.SwiftLink.Infrastructure.Extensions;
@@ -12,7 +11,6 @@ public static class ServiceCollectionExtensions
         services
             .AddSingleton<ILinkRankRepository, JsonRankRepository>()
             .AddSingleton<ISwiftLinkRepository, JsonSwiftLinkRepository>()
-            .AddSingleton<ISwiftLinkService, SwiftLinkService>()
             ;
 
         return services;

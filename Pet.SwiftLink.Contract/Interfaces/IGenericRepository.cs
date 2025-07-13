@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Pet.SwiftLink.Contract.Interfaces
+namespace Pet.SwiftLink.Domain.Interfaces
 {
     public interface IGenericRepository<TEntity, TKey>
     {

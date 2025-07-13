@@ -1,6 +1,6 @@
-using Pet.SwiftLink.Contract.Model;
+using Pet.SwiftLink.Domain.Model;
 
-namespace Pet.SwiftLink.Contract.Interfaces;
+namespace Pet.SwiftLink.Domain.Interfaces;
 
 public interface ILinkRankRepository : IGenericRepository<LinkRank, Guid>
 {
@@ -9,4 +9,6 @@ public interface ILinkRankRepository : IGenericRepository<LinkRank, Guid>
     Task UpdateAsync(LinkRank stat);
 
     Task<IEnumerable<LinkRank>> GetTopItemsAsync(int count);
+
+    Task<LinkRank> IncrementClickAsync(Guid itemId, DateTime timestamp);
 }

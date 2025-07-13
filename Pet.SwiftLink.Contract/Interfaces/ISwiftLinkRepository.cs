@@ -1,6 +1,6 @@
-﻿using Pet.SwiftLink.Contract.Model;
+﻿using Pet.SwiftLink.Domain.Model;
 
-namespace Pet.SwiftLink.Contract.Interfaces
+namespace Pet.SwiftLink.Domain.Interfaces
 {
     public interface ISwiftLinkRepository : IGenericRepository<QuickLink, Guid>
     {
