@@ -68,15 +68,6 @@ public class MainViewModel : ObservableObject
     {
         var addQuickLinkDialog = new AddQuickLinkDialog();
 
-        ((AddQuickLinkDialogViewModel)addQuickLinkDialog.DataContext).Confirmed += (s, link) =>
-        {
-            if (link != null)
-            {
-                QuickLinks.Add(new QuickLinkViewModel(link));
-                SaveQuickLink(link);
-            }
-        };
-
         ContentDialogResult result = await _contentDialogService.ShowSimpleDialogAsync(
             new SimpleContentDialogCreateOptions()
             {
@@ -87,6 +78,15 @@ public class MainViewModel : ObservableObject
             }
         );
 
+        if (result == ContentDialogResult.Primary)
+        {
+            var addQuickLinkVM = (AddQuickLinkDialogViewModel)addQuickLinkDialog.DataContext;
+            if (addQuickLinkVM.Result != null)
+            {
+                QuickLinks.Add(new QuickLinkViewModel(addQuickLinkVM.Result));
+                SaveQuickLink(addQuickLinkVM.Result);
+            }
+        }
 
         DialogResultText = result switch
         {

@@ -38,8 +38,6 @@ namespace Pet.SwiftLink.Desktop.ViewModels
             BrowseCommand = new RelayCommand(Browse);
         }
 
-        public event EventHandler<QuickLink>? Confirmed;
-
         public void Browse(object parameter)
         {
             if (SelectedType == QuickLinkType.Folder)
@@ -65,7 +63,6 @@ namespace Pet.SwiftLink.Desktop.ViewModels
                 Type = SelectedType
             };
 
-            Confirmed?.Invoke(this, Result);
         }
 
     }
