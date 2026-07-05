@@ -9,5 +9,7 @@ namespace Pet.SwiftLink.Application.Interfaces
         Task RecordAsync(QuickLink link);
 
         Task RecordAsync(IEnumerable<QuickLink> links);
+
+        Task DeleteAsync(Guid id);
     }
 }

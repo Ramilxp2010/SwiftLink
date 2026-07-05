@@ -32,5 +32,11 @@ namespace Pet.SwiftLink.Application.Implementation
                 await RecordAsync(link);
             }
         }
+
+        public Task DeleteAsync(Guid id)
+        {
+            _repository.Delete(id);
+            return Task.CompletedTask;
+        }
     }
 }

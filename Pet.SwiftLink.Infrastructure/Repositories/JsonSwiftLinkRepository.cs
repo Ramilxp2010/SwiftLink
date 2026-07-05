@@ -14,5 +14,16 @@ namespace Pet.SwiftLink.Infrastructure.Repositories
         {
             DataSource.AddOrUpdate(entity.Id, entity, (id, old) => old);
         }
+
+        public override void Delete(Guid id)
+        {
+            if (!DataSource.TryRemove(id, out _))
+            {
+                Log($"Entity with key {id} not found for deletion.");
+                return;
+            }
+
+            SaveAsync().GetAwaiter().GetResult();
+        }
     }
 }

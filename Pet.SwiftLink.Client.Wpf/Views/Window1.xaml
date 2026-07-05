@@ -20,12 +20,13 @@
                     Icon="{ui:SymbolIcon Home24}"
                     TargetPageType="{x:Type pages:ItemPage}"/>
                 
-                <ui:NavigationViewItem Content="Top"
+                <!--<ui:NavigationViewItem Content="Top"
                     Icon="{ui:SymbolIcon DataBarVerticalStar32}"
-                    TargetPageType="{x:Type pages:ExperementalPage}"/>
+                    TargetPageType="{x:Type pages:ExperementalPage}"/>-->
                 
                 <ui:NavigationViewItem Content="Settings" 
-                    Icon="{ui:SymbolIcon Settings24}"/>
+                    Icon="{ui:SymbolIcon Settings24}"
+                    TargetPageType="{x:Type pages:SettingsPage}"/>
                 
             </ui:NavigationView.MenuItems>
 

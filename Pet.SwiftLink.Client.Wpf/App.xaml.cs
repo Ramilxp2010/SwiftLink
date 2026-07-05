@@ -33,6 +33,7 @@ namespace Pet.SwiftLink.Desktop
             services.AddSingleton<IContentDialogService, ContentDialogService>();
             services.AddSingleton<Window1>();
             services.AddSingleton<MainViewModel>();
+            services.AddSingleton<SettingsViewModel>();
 
             services.AddRepository();
             services.AddRanging();

@@ -141,6 +141,7 @@ public class MainViewModel : ObservableObject
     {
         if (parameter is not QuickLinkViewModel link) return;
         QuickLinks.Remove(link);
+        _linkService.DeleteAsync(link.Model.Id);
     }
 
     private bool CanRemoveQuickLink(object parameter) => parameter != null;
