@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Pet.SwiftLink.Domain.Interfaces;
 using Pet.SwiftLink.Desktop.Services;
+using Pet.SwiftLink.Desktop.Services.HotKeys;
 using Pet.SwiftLink.Desktop.ViewModels;
 using Pet.SwiftLink.Desktop.Views;
 using Pet.SwiftLink.Infrastructure.Extensions;
@@ -24,13 +25,26 @@ namespace Pet.SwiftLink.Desktop
             Services = services.BuildServiceProvider();
 
             var mainWindow = Services.GetRequiredService<Window1>();
+            MainWindow = mainWindow;
             mainWindow.Show();
+
+            RegisterGlobalHotKey();
+        }
+
+        private void RegisterGlobalHotKey()
+        {
+            var hotKeyService = Services!.GetRequiredService<IHotKeyService>();
+            var windowActivator = Services.GetRequiredService<IMainWindowActivator>();
+
+            hotKeyService.TryRegister(HotKeyDefinition.Default, windowActivator.Activate);
         }
         
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<IContentDialogService, ContentDialogService>();
+            services.AddSingleton<IMainWindowActivator, MainWindowActivator>();
+            services.AddSingleton<IHotKeyService, HotKeyService>();
             services.AddSingleton<Window1>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<SettingsViewModel>();
@@ -45,6 +59,7 @@ namespace Pet.SwiftLink.Desktop
         {
             try
             {
+                DisposeService<IHotKeyService>();
                 DisposeService<ILinkRankRepository>();
                 DisposeService<ISwiftLinkRepository>();
             }

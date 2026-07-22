@@ -94,6 +94,8 @@ public abstract class JsonGenericRepository<TEntity, TKey> : IGenericRepository<
         }
     }
 
+    protected void SaveSync() => SaveDataToDisk();
+
     private void SaveDataToDisk()
     {
         // Используется таймером: sync-версия

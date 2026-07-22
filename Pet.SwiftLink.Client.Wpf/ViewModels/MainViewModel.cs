@@ -22,6 +22,7 @@ public class MainViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private readonly IStatisticTracker _statisticTracker;
     private readonly ISwiftLinkService _linkService;
+    private readonly IMainWindowActivator _mainWindowActivator;
 
     private readonly IContentDialogService _contentDialogService;
 
@@ -47,7 +48,12 @@ public class MainViewModel : ObservableObject
     public ICommand RemoveQuickLinkCommand { get; }
     public ICommand MinimizeToTrayCommand { get; }
 
-    public MainViewModel(IDialogService dialogService, IStatisticTracker statisticTracker, IContentDialogService contentDialogService, ISwiftLinkService linkService)
+    public MainViewModel(
+        IDialogService dialogService,
+        IStatisticTracker statisticTracker,
+        IContentDialogService contentDialogService,
+        ISwiftLinkService linkService,
+        IMainWindowActivator mainWindowActivator)
     {
         _trayIconViewModel = new TrayIconViewModel(ShowWindow, CloseApplication);
 
@@ -55,6 +61,7 @@ public class MainViewModel : ObservableObject
         _statisticTracker = statisticTracker;
         _contentDialogService = contentDialogService;
         _linkService = linkService;
+        _mainWindowActivator = mainWindowActivator;
 
         OpenQuickLinkCommand = new RelayCommand(OpenQuickLink, CanOpenQuickLink);
         RemoveQuickLinkCommand = new RelayCommand(RemoveQuickLink, CanRemoveQuickLink);
@@ -146,11 +153,7 @@ public class MainViewModel : ObservableObject
 
     private bool CanRemoveQuickLink(object parameter) => parameter != null;
 
-    private void ShowWindow()
-    {
-        WinApp.Current.MainWindow.Show();
-        WinApp.Current.MainWindow.WindowState = WindowState.Normal;
-    }
+    private void ShowWindow() => _mainWindowActivator.Activate();
 
     private void MinimizeToTray()
     {

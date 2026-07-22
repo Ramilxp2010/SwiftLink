@@ -23,7 +23,7 @@ namespace Pet.SwiftLink.Infrastructure.Repositories
                 return;
             }
 
-            SaveAsync().GetAwaiter().GetResult();
+            SaveSync();
         }
     }
 }
