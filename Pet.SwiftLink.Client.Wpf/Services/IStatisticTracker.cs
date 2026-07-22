@@ -6,4 +6,5 @@ public interface IStatisticTracker
 {
     Task TrackClickAsync(Guid itemId);
     Task<IEnumerable<QuickLink>> OrderByPopularity(IEnumerable<QuickLink> items);
+    Task<IReadOnlyDictionary<Guid, LinkRank>> GetRanksAsync();
 }

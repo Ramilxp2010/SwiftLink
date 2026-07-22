@@ -3,36 +3,297 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Pet.SwiftLink.Desktop.Views"
-        xmlns:pages="clr-namespace:Pet.SwiftLink.Desktop.Views"
+        xmlns:vm="clr-namespace:Pet.SwiftLink.Desktop.ViewModels"
+        xmlns:conv="clr-namespace:Pet.SwiftLink.Desktop.Converters"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        mc:Ignorable="d" Height="450" Width="800">
+        mc:Ignorable="d"
+        Title="SwiftLink"
+        Height="720" Width="1180"
+        MinHeight="560" MinWidth="960"
+        Background="{StaticResource AppBackground}"
+        PreviewKeyDown="Window_PreviewKeyDown">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:ResourceKeyToBrushConverter x:Key="BrushKeyConverter"/>
+
+        <Style x:Key="SidebarNavButtonStyle" TargetType="Button" BasedOn="{StaticResource NavItemStyle}">
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="Active">
+                    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                    <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Key="K" Modifiers="Control" Command="{Binding FocusSearchCommand}"/>
+    </Window.InputBindings>
+
     <Grid>
-        <ui:NavigationView 
-            IsBackButtonVisible="Auto"  
-            x:Name="RootNavigation"
-            PaneTitle="Menu"
-            PaneDisplayMode="LeftFluent"
-            >
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem 
-                    Content="Home"
-                    Icon="{ui:SymbolIcon Home24}"
-                    TargetPageType="{x:Type pages:ItemPage}"/>
-                
-                <!--<ui:NavigationViewItem Content="Top"
-                    Icon="{ui:SymbolIcon DataBarVerticalStar32}"
-                    TargetPageType="{x:Type pages:ExperementalPage}"/>-->
-                
-                <ui:NavigationViewItem Content="Settings" 
-                    Icon="{ui:SymbolIcon Settings24}"
-                    TargetPageType="{x:Type pages:SettingsPage}"/>
-                
-            </ui:NavigationView.MenuItems>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
-        </ui:NavigationView>
+        <!-- Left sidebar -->
+        <Border Grid.Column="0"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,0,1,0">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Margin="0,20,0,8">
+                    <TextBlock Text="SwiftLink"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource AccentBrush}"
+                               Margin="20,0,12,18"/>
 
-        <ContentPresenter x:Name="RootContentDialog" Grid.Row="0" />
+                    <Button Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static vm:NavigationFilter.Home}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SidebarNavButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsHomeNavActive}" Value="True">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Home24" Margin="0,0,10,0" FontSize="16"/>
+                            <TextBlock Text="Главная" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static vm:NavigationFilter.Favorites}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SidebarNavButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsFavoritesNavActive}" Value="True">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Star24" Margin="0,0,10,0" FontSize="16"/>
+                            <TextBlock Text="Избранное" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static vm:NavigationFilter.Recent}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SidebarNavButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRecentNavActive}" Value="True">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="History24" Margin="0,0,10,0" FontSize="16"/>
+                            <TextBlock Text="Недавние" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static vm:NavigationFilter.All}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SidebarNavButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAllNavActive}" Value="True">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="AppsList24" Margin="0,0,10,0" FontSize="16"/>
+                            <TextBlock Text="Все элементы" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Text="КАТЕГОРИИ" Style="{StaticResource SidebarSectionLabelStyle}"/>
+
+                    <ItemsControl ItemsSource="{Binding Categories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.SetCategoryFilterCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource SidebarNavButtonStyle}"
+                                        Padding="12,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Margin="2,0,10,0" VerticalAlignment="Center"
+                                                 Fill="{StaticResource AccentBrush}"/>
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,16">
+                    <Button Command="{Binding SetFilterCommand}"
+                            CommandParameter="{x:Static vm:NavigationFilter.Trash}"
+                            ToolTip="Скоро">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SidebarNavButtonStyle}">
+                                <Setter Property="Opacity" Value="0.55"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsTrashNavActive}" Value="True">
+                                        <Setter Property="Tag" Value="Active"/>
+                                        <Setter Property="Opacity" Value="1"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Delete24" Margin="0,0,10,0" FontSize="16"/>
+                            <TextBlock Text="Корзина" VerticalAlignment="Center"/>
+                            <TextBlock Text="скоро" FontSize="10" Margin="8,0,0,0"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding OpenSettingsCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SidebarNavButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSettingsNavActive}" Value="True">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Settings24" Margin="0,0,10,0" FontSize="16"/>
+                            <TextBlock Text="Настройки" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarNavButtonStyle}"
+                            Command="{Binding MinimizeToTrayCommand}"
+                            ToolTip="Свернуть в трей">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="ArrowMinimize24" Margin="0,0,10,0" FontSize="16"/>
+                            <TextBlock Text="Свернуть" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Center content -->
+        <Frame Grid.Column="1"
+               x:Name="ContentFrame"
+               NavigationUIVisibility="Hidden"
+               Background="{StaticResource AppBackground}"/>
+
+        <!-- Right panel -->
+        <Border Grid.Column="2"
+                Width="260"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="1,0,0,0"
+                Visibility="{Binding IsHomeChromeVisible, Converter={StaticResource BoolToVis}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16,20">
+                <StackPanel>
+                    <TextBlock Text="Избранное" Style="{StaticResource SectionTitleStyle}" FontSize="16"/>
+
+                    <TextBlock Text="Закрепите ссылки звёздочкой"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding FavoriteLinks.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <ItemsControl ItemsSource="{Binding FavoriteLinks}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ListRowStyle}"
+                                        MouseLeftButtonDown="FavoriteItem_MouseLeftButtonDown"
+                                        Tag="{Binding}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="32" Height="32" CornerRadius="8"
+                                                Background="{StaticResource AccentSoftBrush}"
+                                                Margin="0,0,10,0">
+                                            <ui:SymbolIcon Symbol="Star24" FontSize="14"
+                                                           Foreground="{StaticResource AccentBrush}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="{Binding Category}" FontSize="11"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="2"
+                                                Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderThickness="0"
+                                                ToolTip="Открепить" Padding="4" Cursor="Hand">
+                                            <ui:SymbolIcon Symbol="Star24" Filled="True" FontSize="14"
+                                                           Foreground="{StaticResource AccentBrush}"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="Категории" Style="{StaticResource SectionTitleStyle}"
+                               FontSize="16" Margin="0,20,0,12"/>
+
+                    <ItemsControl ItemsSource="{Binding CategorySummaries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CategoryChipStyle}"
+                                        Background="{Binding BackgroundKey, Converter={StaticResource BrushKeyConverter}}"
+                                        MouseLeftButtonDown="CategoryChip_MouseLeftButtonDown"
+                                        Tag="{Binding Name}">
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding CountLabel}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{Binding ForegroundKey, Converter={StaticResource BrushKeyConverter}}"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                   Foreground="{Binding ForegroundKey, Converter={StaticResource BrushKeyConverter}}"
+                                                   VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <ContentPresenter x:Name="RootContentDialog" Grid.Column="0" Grid.ColumnSpan="3" Panel.ZIndex="100"/>
     </Grid>
-
 </Window>

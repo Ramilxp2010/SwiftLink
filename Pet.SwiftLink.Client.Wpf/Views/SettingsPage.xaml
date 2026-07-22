@@ -9,11 +9,13 @@
       d:DesignWidth="800"
       ScrollViewer.CanContentScroll="False">
 
-    <Grid Background="Gray">
-        <Border Background="{StaticResource PrimaryBackground}"
-                Margin="5"
-                CornerRadius="8"
-                Padding="20">
+    <Grid Background="{StaticResource AppBackground}">
+        <Border Background="{StaticResource SurfaceBrush}"
+                Margin="24"
+                CornerRadius="14"
+                Padding="24"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="1">
             <StackPanel>
                 <ui:TextBlock Appearance="Primary"
                               Text="Настройки"

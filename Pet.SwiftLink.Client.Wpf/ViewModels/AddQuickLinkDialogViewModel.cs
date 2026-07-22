@@ -10,9 +10,10 @@ namespace Pet.SwiftLink.Desktop.ViewModels
         private string? _name;
         private string? _path;
         private QuickLinkType _selectedType;
+        private string _selectedCategory = QuickLinkCategories.Misc;
 
         public QuickLink? Result { get; private set; }
-        
+
         public string? Name
         {
             get => _name;
@@ -30,6 +31,14 @@ namespace Pet.SwiftLink.Desktop.ViewModels
             get => _selectedType;
             set => SetProperty(ref _selectedType, value);
         }
+
+        public string SelectedCategory
+        {
+            get => _selectedCategory;
+            set => SetProperty(ref _selectedCategory, QuickLinkCategories.Normalize(value));
+        }
+
+        public IReadOnlyList<string> Categories => QuickLinkCategories.All;
 
         public ICommand BrowseCommand { get; }
 
@@ -55,15 +64,28 @@ namespace Pet.SwiftLink.Desktop.ViewModels
                 Name = string.IsNullOrWhiteSpace(Name) ? System.IO.Path.GetFileNameWithoutExtension(Path) : Name;
             }
 
+            BuildResult();
+        }
+
+        public QuickLink? BuildResult()
+        {
+            if (string.IsNullOrWhiteSpace(Path))
+            {
+                Result = null;
+                return null;
+            }
+
             Result = new QuickLink
             {
                 Id = Guid.NewGuid(),
-                Name = Name,
+                Name = string.IsNullOrWhiteSpace(Name) ? System.IO.Path.GetFileName(Path) : Name,
                 Path = Path,
-                Type = SelectedType
+                Type = SelectedType,
+                Category = QuickLinkCategories.Normalize(SelectedCategory),
+                IsPinned = false
             };
 
+            return Result;
         }
-
     }
 }
