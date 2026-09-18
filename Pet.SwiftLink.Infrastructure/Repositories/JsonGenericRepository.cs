@@ -26,7 +26,7 @@ public abstract class JsonGenericRepository<TEntity, TKey> : IGenericRepository<
 
     public abstract void Add(TEntity entity);
 
-    public void Delete(TKey id)
+    public virtual void Delete(TKey id)
     {
         if (!DataSource.TryRemove(id, out _))
         {
@@ -93,6 +93,8 @@ public abstract class JsonGenericRepository<TEntity, TKey> : IGenericRepository<
             _fileSemaphore.Release();
         }
     }
+
+    protected void SaveSync() => SaveDataToDisk();
 
     private void SaveDataToDisk()
     {

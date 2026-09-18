@@ -22,7 +22,13 @@ public class WpfStatisticTracker : IStatisticTracker
     public async Task<IEnumerable<QuickLink>> OrderByPopularity(IEnumerable<QuickLink> items)
     {
         var stats = await _service.GetTopItemsAsync(int.MaxValue);
-        return items.OrderByDescending(x => 
+        return items.OrderByDescending(x =>
             stats.FirstOrDefault(s => s.ItemId == x.Id)?.ClickCount ?? 0);
+    }
+
+    public async Task<IReadOnlyDictionary<Guid, LinkRank>> GetRanksAsync()
+    {
+        var stats = await _service.GetTopItemsAsync(int.MaxValue);
+        return stats.ToDictionary(s => s.ItemId);
     }
 }

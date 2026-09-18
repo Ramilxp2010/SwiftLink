@@ -1,35 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Pet.SwiftLink.Desktop.ViewModels;
 using Wpf.Ui;
-using Wpf.Ui.Abstractions;
-using Wpf.Ui.Controls;
 
 namespace Pet.SwiftLink.Desktop.Views
 {
-    /// <summary>
-    /// Interaction logic for Window1.xaml
-    /// </summary>
     public partial class Window1 : Window
     {
-        public Window1(IContentDialogService contentDialogService)
+        private readonly MainViewModel _viewModel;
+
+        public Window1(IContentDialogService contentDialogService, MainViewModel viewModel)
         {
             InitializeComponent();
+
+            _viewModel = viewModel;
+            DataContext = _viewModel;
+
             contentDialogService.SetDialogHost(RootContentDialog);
 
-            Loaded += (_, _) => RootNavigation.Navigate(typeof(ItemPage));
+            _viewModel.RequestNavigateHome += NavigateHome;
+            _viewModel.RequestNavigateSettings += NavigateSettings;
+            _viewModel.RequestFocusSearch += FocusSearchBox;
 
+            Loaded += (_, _) => NavigateHome();
+        }
+
+        private void NavigateHome()
+        {
+            if (ContentFrame.Content is not ItemPage)
+                ContentFrame.Navigate(new ItemPage());
+        }
+
+        private void NavigateSettings()
+        {
+            ContentFrame.Navigate(new SettingsPage());
+        }
+
+        private void FocusSearchBox()
+        {
+            if (ContentFrame.Content is ItemPage page)
+                page.FocusSearchBox();
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.K && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                FocusSearchBox();
+                e.Handled = true;
+            }
+        }
+
+        private void FavoriteItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount < 2) return;
+            if (sender is FrameworkElement { Tag: QuickLinkViewModel link })
+                _viewModel.OpenQuickLinkCommand.Execute(link);
+        }
+
+        private void CategoryChip_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement { Tag: string category })
+                _viewModel.SetCategoryFilterCommand.Execute(category);
         }
     }
 }

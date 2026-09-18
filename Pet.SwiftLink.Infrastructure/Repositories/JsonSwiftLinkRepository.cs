@@ -12,7 +12,22 @@ namespace Pet.SwiftLink.Infrastructure.Repositories
 
         public override void Add(QuickLink entity)
         {
-            DataSource.AddOrUpdate(entity.Id, entity, (id, old) => old);
+            // Normalize legacy records missing Category / IsPinned
+            entity.Category = QuickLinkCategories.Normalize(entity.Category);
+
+            DataSource.AddOrUpdate(entity.Id, entity, (_, _) => entity);
+            SaveSync();
+        }
+
+        public override void Delete(Guid id)
+        {
+            if (!DataSource.TryRemove(id, out _))
+            {
+                Log($"Entity with key {id} not found for deletion.");
+                return;
+            }
+
+            SaveSync();
         }
     }
 }

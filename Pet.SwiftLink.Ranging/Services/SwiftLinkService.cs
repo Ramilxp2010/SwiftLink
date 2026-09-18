@@ -15,6 +15,11 @@ namespace Pet.SwiftLink.Application.Implementation
 
         public IEnumerable<QuickLink> GetQuickLinks()
         {
+            foreach (var link in _repository.GetAll())
+            {
+                link.Category = QuickLinkCategories.Normalize(link.Category);
+            }
+
             return _repository.GetAll();
         }
 
@@ -31,6 +36,12 @@ namespace Pet.SwiftLink.Application.Implementation
             {
                 await RecordAsync(link);
             }
+        }
+
+        public Task DeleteAsync(Guid id)
+        {
+            _repository.Delete(id);
+            return Task.CompletedTask;
         }
     }
 }

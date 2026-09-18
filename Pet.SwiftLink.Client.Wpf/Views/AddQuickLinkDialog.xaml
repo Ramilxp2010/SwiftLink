@@ -3,20 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Pet.SwiftLink.Desktop"
         xmlns:viewModels="clr-namespace:Pet.SwiftLink.Desktop.ViewModels"
         xmlns:model="clr-namespace:Pet.SwiftLink.Domain.Model;assembly=Pet.SwiftLink.Domain"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        mc:Ignorable="d" Height="450" Width="800">
+        mc:Ignorable="d" MinWidth="360">
 
     <UserControl.DataContext>
         <viewModels:AddQuickLinkDialogViewModel/>
     </UserControl.DataContext>
 
-    <StackPanel>
-        <Label Content="Выберите тип:"/>
-        <ComboBox SelectedIndex="0" BorderThickness="2"
-                  SelectedItem="{Binding SelectedType, Mode=TwoWay}">
+    <StackPanel Margin="4">
+        <Label Content="Тип"/>
+        <ComboBox SelectedIndex="0" BorderThickness="1"
+                  SelectedItem="{Binding SelectedType, Mode=TwoWay}"
+                  Margin="0,0,0,8">
             <ComboBox.ItemsSource>
                 <x:Array Type="{x:Type model:QuickLinkType}">
                     <model:QuickLinkType>Folder</model:QuickLinkType>
@@ -26,14 +26,23 @@
             </ComboBox.ItemsSource>
         </ComboBox>
 
-        <ui:TextBox Margin="0 5" PlaceholderText="Введите псевдоним..." BorderThickness="2"
-                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="Категория"/>
+        <ComboBox ItemsSource="{Binding Categories}"
+                  SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                  BorderThickness="1"
+                  Margin="0,0,0,8"/>
+
+        <ui:TextBox Margin="0,0,0,8" PlaceholderText="Псевдоним..."
+                    BorderThickness="1"
+                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
         <StackPanel Orientation="Horizontal">
-            <ui:TextBox PlaceholderText="Путь.." Width="300"
-                                Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" BorderThickness="2"/>
-            <ui:Button Appearance="Dark" Content="..." Width="30" Margin="5,0,0,0"
-                    Command="{Binding BrowseCommand}"/>
+            <ui:TextBox PlaceholderText="Путь..."
+                        Width="300"
+                        Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
+                        BorderThickness="1"/>
+            <ui:Button Appearance="Secondary" Content="..." Width="36" Margin="8,0,0,0"
+                       Command="{Binding BrowseCommand}"/>
         </StackPanel>
     </StackPanel>
 </UserControl>
